@@ -73,6 +73,15 @@ class FileSystem {
 
     return content;
   }
+
+  deleteFile(name) {
+    const inode = this.#inodeTable[name];
+    if (!inode) throw new Error("File Doesn't Exist");
+    const dataBlocks = inode.getDataBlocks();
+    this.#availableBlocks = [...this.#availableBlocks, ...dataBlocks];
+    
+    delete this.#inodeTable[name];
+  }
 }
 
 module.exports = FileSystem;

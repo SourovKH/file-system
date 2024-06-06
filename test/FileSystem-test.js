@@ -36,4 +36,22 @@ describe("FileSystem", () => {
       message: "File Doesn't Exist",
     });
   });
+
+  it("Should throw error when tring to delete file which doesnt exist", () => {
+    const fs = new FileSystem(80, 8);
+    assert.throws(() => fs.deleteFile("demo.txt"), {
+      message: "File Doesn't Exist",
+    });
+  });
+
+  it("Should be able to delete a file", () => {
+    const fs = new FileSystem(80, 8);
+    const content = [...Buffer.from("This is a line", "utf-8")];
+    fs.createFile("demo.txt", content);
+    fs.deleteFile("demo.txt");
+
+    assert.throws(() => fs.readFile("demo.txt"), {
+      message: "File Doesn't Exist",
+    });
+  });
 });
