@@ -12,4 +12,11 @@ describe("Inode", () => {
     const inode = new Inode([1, 5], 10);
     assert.deepStrictEqual(inode.getSize(), 10);
   });
+
+  it("should be set new data blocks to the file", () => {
+    const inode = new Inode([1, 5], 10);
+    inode.setDataBlocks([2, 3], 11);
+    assert.deepStrictEqual(inode.getDataBlocks(), [2, 3]);
+    assert.deepStrictEqual(inode.getSize(), 11);
+  });
 });

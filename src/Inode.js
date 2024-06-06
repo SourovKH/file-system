@@ -12,6 +12,11 @@ class Inode {
     return [...this.#dataBlocks];
   }
 
+  setDataBlocks(dataBlocks, size) {
+    this.#dataBlocks = [...dataBlocks];
+    this.#size = size;
+  }
+
   getSize() {
     return this.#size;
   }

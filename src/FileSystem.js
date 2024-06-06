@@ -9,19 +9,12 @@ class FileSystem {
 
   constructor(memorySize, blockSize) {
     this.#blockSize = blockSize;
-    this.#memory = new Array(memorySize).fill("");
+    this.#memory = new Array(memorySize).fill(null);
     this.#availableBlocks = Array.from(
       { length: Math.floor(memorySize / blockSize) },
       (_, i) => i
     );
     this.#inodeTable = {};
-  }
-
-  #allocateDataBlocks(noOfBlocksToAllocate) {
-    if (noOfBlocksToAllocate > this.#availableBlocks.length)
-      throw new Error("Not Enough Space");
-
-    return this.#availableBlocks.splice(0, noOfBlocksToAllocate);
   }
 
   list() {
@@ -39,14 +32,19 @@ class FileSystem {
     };
   }
 
-  createFile(name, content) {
+  #allocateDataBlocks(noOfBlocksToAllocate) {
+    if (noOfBlocksToAllocate > this.#availableBlocks.length)
+      throw new Error("Not Enough Space");
+
+    return this.#availableBlocks.splice(0, noOfBlocksToAllocate);
+  }
+
+  createFile(name) {
     if (this.#inodeTable[name]) throw new Error("File Already Exists");
-    const dataBlocksRequired = Math.ceil(content.length / this.#blockSize);
-    const dataBlocksAllocated = this.#allocateDataBlocks(dataBlocksRequired);
-    const inodeCreated = new Inode(dataBlocksAllocated, content.length);
+    const inodeCreated = new Inode([], 0);
     this.#inodeTable[name] = inodeCreated;
 
-    this.writeToFile(name, content);
+    return inodeCreated;
   }
 
   #writeContentToMemory(contentBlock, dataBlockIndex) {
@@ -65,8 +63,12 @@ class FileSystem {
   }
 
   writeToFile(name, content) {
-    const inode = this.#inodeTable[name];
-    if (!inode) return this.createFile(name, content);
+    if (this.#inodeTable[name]) this.deleteFile(name);
+    const inode = this.createFile(name);
+    const dataBlocksRequired = Math.ceil(content.length / this.#blockSize);
+    const dataBlocksAllocated = this.#allocateDataBlocks(dataBlocksRequired);
+    inode.setDataBlocks(dataBlocksAllocated, content.length);
+
     this.#write(content, inode);
   }
 
@@ -80,7 +82,7 @@ class FileSystem {
       const dataBlockStartMemoryIndex = dataBlock * this.#blockSize;
       for (let i = 0; i < this.#blockSize; i++) {
         const data = this.#memory[dataBlockStartMemoryIndex + i];
-        if (data !== "") content.push(data);
+        if (data !== null) content.push(data);
       }
 
       return content;
@@ -100,7 +102,8 @@ class FileSystem {
 
   copyFile(from, to) {
     const content = this.readFile(from);
-    this.createFile(to, content);
+    this.createFile(to);
+    this.writeToFile(to, content)
   }
 }
 
