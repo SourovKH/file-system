@@ -17,7 +17,7 @@ class FileSystem {
     this.#inodeTable = {};
   }
 
-  #allocateDataBlock(noOfBlocksToAllocate) {
+  #allocateDataBlocks(noOfBlocksToAllocate) {
     if (noOfBlocksToAllocate > this.#availableBlocks.length)
       throw new Error("Not Enough Space");
 
@@ -27,27 +27,31 @@ class FileSystem {
   createFile(name, content) {
     if (this.#inodeTable[name]) throw new Error("File Already Exists");
     const dataBlocksRequired = Math.ceil(content.length / this.#blockSize);
-    const dataBlocksAllocated = this.#allocateDataBlock(dataBlocksRequired);
+    const dataBlocksAllocated = this.#allocateDataBlocks(dataBlocksRequired);
     const inodeCreated = new Inode(dataBlocksAllocated, content.length);
     this.#inodeTable[name] = inodeCreated;
 
     this.writeToFile(name, content);
   }
 
+  #writeContentToMemory(contentBlock, dataBlockIndex) {
+    contentBlock.forEach((data, index) => {
+      const memoryIndex = dataBlockIndex * this.#blockSize + index;
+      this.#memory[memoryIndex] = data;
+    });
+  }
+
   #write(content, inode) {
     const allocatedBlocks = inode.getDataBlocks();
     return lo.chunk(content, this.#blockSize).map((contentBlock, index) => {
-      const dataBlock = allocatedBlocks[index];
-      contentBlock.forEach((data, index) => {
-        const memoryIndex = dataBlock * this.#blockSize + index;
-        this.#memory[memoryIndex] = data;
-      });
+      const dataBlockIndex = allocatedBlocks[index];
+      this.#writeContentToMemory(contentBlock, dataBlockIndex);
     });
   }
 
   writeToFile(name, content) {
     const inode = this.#inodeTable[name];
-    if (!inode) return this.createFile(name, contentInBuffer);
+    if (!inode) return this.createFile(name, content);
     this.#write(content, inode);
   }
 
