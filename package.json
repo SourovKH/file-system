@@ -16,5 +16,11 @@
   "bugs": {
     "url": "https://github.com/SourovKH/file-system/issues"
   },
-  "homepage": "https://github.com/SourovKH/file-system#readme"
+  "homepage": "https://github.com/SourovKH/file-system#readme",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "sinon": "^18.0.0"
+  }
 }
