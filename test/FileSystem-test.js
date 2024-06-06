@@ -54,4 +54,41 @@ describe("FileSystem", () => {
       message: "File Doesn't Exist",
     });
   });
+
+  it("Should throw error when the file to copy doesnt exist", () => {
+    const fs = new FileSystem(80, 8);
+
+    assert.throws(() => fs.copyFile("demo1.txt", "demo2.txt"), {
+      message: "File Doesn't Exist",
+    });
+  });
+
+  it("Should throw error when there is not enough space to copy file", () => {
+    const fs = new FileSystem(16, 8);
+    const content = [...Buffer.from("This is a line", "utf-8")];
+    fs.createFile("demo1.txt", content);
+
+    assert.throws(() => fs.copyFile("demo1.txt", "demo2.txt"), {
+      message: "Not Enough Space",
+    });
+  });
+
+  it("Should throw error when the name of the copy is already used", () => {
+    const fs = new FileSystem(80, 8);
+    const content = [...Buffer.from("This is a line", "utf-8")];
+    fs.createFile("demo1.txt", content);
+
+    assert.throws(() => fs.copyFile("demo1.txt", "demo1.txt"), {
+      message: "File Already Exists",
+    });
+  });
+
+  it("Should make a new copy of the file with the same content", () => {
+    const fs = new FileSystem(80, 8);
+    const content = [...Buffer.from("This is a line", "utf-8")];
+    fs.createFile("demo1.txt", content);
+    fs.copyFile("demo1.txt", "demo2.txt");
+
+    assert.deepStrictEqual(fs.readFile("demo2.txt"), content);
+  });
 });

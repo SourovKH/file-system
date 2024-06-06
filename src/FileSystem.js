@@ -79,8 +79,13 @@ class FileSystem {
     if (!inode) throw new Error("File Doesn't Exist");
     const dataBlocks = inode.getDataBlocks();
     this.#availableBlocks = [...this.#availableBlocks, ...dataBlocks];
-    
+
     delete this.#inodeTable[name];
+  }
+
+  copyFile(from, to) {
+    const content = this.readFile(from);
+    this.createFile(to, content);
   }
 }
 
