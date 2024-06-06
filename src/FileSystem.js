@@ -34,7 +34,7 @@ class FileSystem {
 
   #allocateDataBlocks(noOfBlocksToAllocate) {
     if (noOfBlocksToAllocate > this.#availableBlocks.length)
-      throw new Error("Not Enough Space");
+      throw new Error("Out of memory!!");
 
     return this.#availableBlocks.splice(0, noOfBlocksToAllocate);
   }

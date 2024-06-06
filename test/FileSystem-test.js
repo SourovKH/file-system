@@ -5,7 +5,6 @@ const FileSystem = require("../src/FileSystem");
 describe("FileSystem", () => {
   it("Should be able to create a file", () => {
     const fs = new FileSystem(80, 8);
-    const content = [...Buffer.from("This is a line", "utf-8")];
     fs.createFile("demo.txt");
 
     assert.deepStrictEqual(fs.readFile("demo.txt"), []);
@@ -13,7 +12,6 @@ describe("FileSystem", () => {
 
   it("Should throw error when a file is being created with already used name", () => {
     const fs = new FileSystem(80, 8);
-    const content = [...Buffer.from("This is a line", "utf-8")];
     fs.createFile("demo.txt");
 
     assert.throws(() => fs.createFile("demo.txt"), {
@@ -26,7 +24,7 @@ describe("FileSystem", () => {
     const content = [...Buffer.from("This is a line", "utf-8")];
 
     assert.throws(() => fs.writeToFile("demo.txt", content), {
-      message: "Not Enough Space",
+      message: "Out of memory!!",
     });
   });
 
@@ -46,7 +44,6 @@ describe("FileSystem", () => {
 
   it("Should be able to delete a file", () => {
     const fs = new FileSystem(80, 8);
-    const content = [...Buffer.from("This is a line", "utf-8")];
     fs.createFile("demo.txt");
     fs.deleteFile("demo.txt");
 
@@ -69,13 +66,12 @@ describe("FileSystem", () => {
     fs.writeToFile("demo1.txt", content);
 
     assert.throws(() => fs.copyFile("demo1.txt", "demo2.txt"), {
-      message: "Not Enough Space",
+      message: "Out of memory!!",
     });
   });
 
   it("Should throw error when the name of the copy is already used", () => {
     const fs = new FileSystem(80, 8);
-    const content = [...Buffer.from("This is a line", "utf-8")];
     fs.createFile("demo1.txt");
 
     assert.throws(() => fs.copyFile("demo1.txt", "demo1.txt"), {
@@ -94,7 +90,6 @@ describe("FileSystem", () => {
 
   it("Should consume no space when a file is created", () => {
     const fs = new FileSystem(80, 8);
-    const content = [...Buffer.from("This is a line", "utf-8")];
     fs.createFile("demo1.txt");
 
     assert.deepStrictEqual(fs.stats(), {
@@ -121,7 +116,6 @@ describe("FileSystem", () => {
 
   it("Should list the files present", () => {
     const fs = new FileSystem(80, 8);
-    const content = [...Buffer.from("This is a line", "utf-8")];
     fs.createFile("demo1.txt");
     fs.copyFile("demo1.txt", "demo2.txt");
 
