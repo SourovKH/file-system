@@ -105,4 +105,13 @@ describe("FileSystem", () => {
       totalSpace: 80,
     });
   });
+
+  it("Should list the files present", () => {
+    const fs = new FileSystem(80, 8);
+    const content = [...Buffer.from("This is a line", "utf-8")];
+    fs.createFile("demo1.txt", content);
+    fs.copyFile("demo1.txt", "demo2.txt");
+
+    assert.deepStrictEqual(fs.list(), ["demo1.txt", "demo2.txt"]);
+  });
 });

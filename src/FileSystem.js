@@ -24,6 +24,10 @@ class FileSystem {
     return this.#availableBlocks.splice(0, noOfBlocksToAllocate);
   }
 
+  list() {
+    return Object.keys(this.#inodeTable);
+  }
+
   stats() {
     const totalSpace = this.#memory.length;
     const availableSpace = this.#availableBlocks.length * this.#blockSize;
