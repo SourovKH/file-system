@@ -91,4 +91,18 @@ describe("FileSystem", () => {
 
     assert.deepStrictEqual(fs.readFile("demo2.txt"), content);
   });
+
+  it("Should be able to provide stats about space consumption", () => {
+    const fs = new FileSystem(80, 8);
+    const content = [...Buffer.from("This is a line", "utf-8")];
+    fs.createFile("demo1.txt", content);
+    fs.copyFile("demo1.txt", "demo2.txt");
+
+    assert.deepStrictEqual(fs.stats(), {
+      availableSpace: 48,
+      noOfFiles: 2,
+      occupiedSpace: 32,
+      totalSpace: 80,
+    });
+  });
 });

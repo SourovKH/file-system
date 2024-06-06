@@ -24,6 +24,17 @@ class FileSystem {
     return this.#availableBlocks.splice(0, noOfBlocksToAllocate);
   }
 
+  stats() {
+    const totalSpace = this.#memory.length;
+    const availableSpace = this.#availableBlocks.length * this.#blockSize;
+    return {
+      noOfFiles: Object.keys(this.#inodeTable).length,
+      availableSpace,
+      totalSpace,
+      occupiedSpace: totalSpace - availableSpace,
+    };
+  }
+
   createFile(name, content) {
     if (this.#inodeTable[name]) throw new Error("File Already Exists");
     const dataBlocksRequired = Math.ceil(content.length / this.#blockSize);
