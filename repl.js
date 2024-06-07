@@ -41,6 +41,7 @@ const copyFile = (fs, source, dest) => {
 };
 
 const mkdir = (fs, path) => {
+  if (!path) throw new Error("No path provided");
   fs.createDirectory(path);
   console.log("Directory created successfully");
 };

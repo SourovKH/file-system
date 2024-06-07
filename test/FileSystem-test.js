@@ -36,6 +36,15 @@ describe("FileSystem", () => {
     });
   });
 
+  it("Should throw error when there is not enough space to write the content", () => {
+    const fs = new FileSystem(8, 8);
+    const content = [...Buffer.from("This is a line", "utf-8")];
+
+    assert.throws(() => fs.writeToFile("/doc/demo.txt", content), {
+      message: 'Directory "doc" not found',
+    });
+  });
+
   it("Should throw error when trying to read a file not being created", () => {
     const fs = new FileSystem(80, 8);
     assert.throws(() => fs.readFile("/demo.txt"), {

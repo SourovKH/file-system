@@ -1,10 +1,15 @@
 class Directory {
   #files;
   #subDirectories;
+  #isRootDir;
 
-  constructor() {
+  constructor(isRootDir, parentDirectory) {
+    this.#isRootDir = isRootDir;
     this.#files = {};
-    this.#subDirectories = {};
+    this.#subDirectories = {
+      ".": this,
+      "..": parentDirectory || this,
+    };
   }
 
   getFiles() {
@@ -12,7 +17,11 @@ class Directory {
   }
 
   getSubDirectories() {
-    return { ...this.#subDirectories };
+    const allSubdirectories = { ...this.#subDirectories };
+    delete allSubdirectories["."];
+    delete allSubdirectories[".."];
+
+    return allSubdirectories;
   }
 
   addFile(name, file) {

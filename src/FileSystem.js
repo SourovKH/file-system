@@ -17,7 +17,7 @@ class FileSystem {
       (_, i) => i
     );
     this.#noOfFiles = 0;
-    this.#root = new Directory();
+    this.#root = new Directory(true);
   }
 
   #getPathParts(path) {
@@ -49,7 +49,7 @@ class FileSystem {
     let current = this.#root;
     for (const part of parts) {
       if (!current.getSubDirectory(part)) {
-        const newDir = new Directory();
+        const newDir = new Directory(false, current);
         current.addSubDirectory(part, newDir);
       }
       current = current.getSubDirectory(part);
@@ -123,15 +123,8 @@ class FileSystem {
     this.#write(content, inode);
   }
 
-  readFile(path) {
-    const { fileName, dirPath } = this.#resolvePath(path);
-    const dir = this.#getDirectory(dirPath);
-
-    const inode = dir.getFile(fileName);
-    if (!inode) throw new Error("File Doesn't Exist");
-
-    const dataBlocks = inode.getDataBlocks();
-    const content = dataBlocks.flatMap((dataBlock) => {
+  #readFromMemory(dataBlocks) {
+    return dataBlocks.flatMap((dataBlock) => {
       const content = [];
       const dataBlockStartMemoryIndex = dataBlock * this.#blockSize;
       for (let i = 0; i < this.#blockSize; i++) {
@@ -141,8 +134,17 @@ class FileSystem {
 
       return content;
     });
+  }
 
-    return content;
+  readFile(path) {
+    const { fileName, dirPath } = this.#resolvePath(path);
+    const dir = this.#getDirectory(dirPath);
+
+    const inode = dir.getFile(fileName);
+    if (!inode) throw new Error("File Doesn't Exist");
+
+    const dataBlocks = inode.getDataBlocks();
+    return this.#readFromMemory(dataBlocks);
   }
 
   deleteFile(path) {
